@@ -70,11 +70,7 @@
             font-family: 'Cairo', sans-serif;
         }
 
-        .clip-path-slant {
-            clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
-        }
-
-        /* تحسين مظهر السكرول بار */
+        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -84,37 +80,34 @@
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
+            background: #1e293b;
             border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+            background: #0f172a;
+        }
+
+        .rtl {
+            direction: rtl;
+        }
+
+        .ltr {
+            direction: ltr;
         }
     </style>
 </head>
 
-<body class="bg-slate-50 text-slate-900 selection:bg-fuchsia-200 selection:text-fuchsia-900">
+<body class="bg-white text-slate-900 selection:bg-black selection:text-white">
 
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // --- أيقونات (SVG Components) ---
+        // --- Icons ---
         const Icon = ({ path, size = 24, className = "" }) => (
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width={size}
-                height={size}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className={className}
-            >
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
                 {path}
             </svg>
         );
@@ -124,450 +117,309 @@
             X: (props) => <Icon {...props} path={<><path d="M18 6 6 18" /><path d="m6 6 12 12" /></>} />,
             Instagram: (props) => <Icon {...props} path={<><rect width="20" height="20" x="2" y="2" rx="5" ry="5" /><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" /><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" /></>} />,
             Menu: (props) => <Icon {...props} path={<><line x1="4" x2="20" y1="12" y2="12" /><line x1="4" x2="20" y1="6" y2="6" /><line x1="4" x2="20" y1="18" y2="18" /></>} />,
-            ChevronLeft: (props) => <Icon {...props} path={<path d="m15 18-6-6 6-6" />} />,
-            CheckCircle: (props) => <Icon {...props} path={<><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></>} />,
-            Send: (props) => <Icon {...props} path={<><line x1="22" x2="11" y1="2" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></>} />,
-            Zap: (props) => <Icon {...props} path={<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />} />,
-            Users: (props) => <Icon {...props} path={<><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></>} />,
-            Layers: (props) => <Icon {...props} path={<><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" /></>} />,
-            Hexagon: (props) => <Icon {...props} path={<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />} />,
             Star: (props) => <Icon {...props} path={<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />} />,
-            Sparkles: (props) => <Icon {...props} path={<><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /><path d="M5 3v4" /><path d="M9 3v4" /><path d="M3 5h4" /><path d="M3 9h4" /></>} />
+            Check: (props) => <Icon {...props} path={<polyline points="20 6 9 17 4 12" />} />,
+            Globe: (props) => <Icon {...props} path={<circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>} />
+        };
+
+        // --- Translations ---
+        const translations = {
+            ar: {
+                home: "الرئيسية",
+                about: "عن زُمَراً",
+                shop: "تسوق",
+                language: "English",
+                heroTitle: "أعد تعريف لحظات التواصل",
+                heroSubtitle: "لعبة كروت اجتماعية مصممة بعناية لتخلق حواراً هادفاً وممتعاً في مجالسكم.",
+                shopNow: "تسوق الآن",
+                price: "250 ج.م",
+                addToCart: "أضف للسلة",
+                features: [
+                    "تصميم فيكتوري فريد",
+                    "أسئلة عميقة ومبتكرة",
+                    "مناسبة لكل التجمعات",
+                    "خامات عالية الجودة"
+                ],
+                reviewsTitle: "آراء العملاء",
+                reviewsSubtitle: "ماذا يقول الناس عن زُمَراً",
+                cartTitle: "حقيبة المشتريات",
+                cartEmpty: "الحقيبة فارغة حالياً",
+                checkout: "تأكيد الطلب",
+                total: "الإجمالي",
+                form: {
+                    name: "الاسم",
+                    phone: "رقم الهاتف",
+                    city: "المدينة",
+                    address: "العنوان بالتفصيل"
+                },
+                footerText: "صممت بكل شغف لتكون ذكرى."
+            },
+            en: {
+                home: "Home",
+                about: "About",
+                shop: "Shop",
+                language: "العربية",
+                heroTitle: "Redefine Social Moments",
+                heroSubtitle: "A social card game carefully designed to create meaningful and fun dialogue in your gatherings.",
+                shopNow: "Shop Now",
+                price: "250 EGP",
+                addToCart: "Add to Cart",
+                features: [
+                    "Unique Victorian Design",
+                    "Deep & Creative Questions",
+                    "Perfect for Gatherings",
+                    "High Quality Materials"
+                ],
+                reviewsTitle: "Customer Reviews",
+                reviewsSubtitle: "What people say about Zumran",
+                cartTitle: "Shopping Cart",
+                cartEmpty: "Your cart is empty",
+                checkout: "Checkout",
+                total: "Total",
+                form: {
+                    name: "Name",
+                    phone: "Phone Number",
+                    city: "City",
+                    address: "Detailed Address"
+                },
+                footerText: "Designed with passion to be a memory."
+            }
         };
 
         const ZumranShop = () => {
+            const [lang, setLang] = useState('ar');
             const [isCartOpen, setIsCartOpen] = useState(false);
             const [cart, setCart] = useState([]);
             const [isMenuOpen, setIsMenuOpen] = useState(false);
-            const [showSuccess, setShowSuccess] = useState(false);
 
-            // بيانات المنتج
+            const t = translations[lang];
+            const dir = lang === 'ar' ? 'rtl' : 'ltr';
+
+            // Effect to update document direction
+            useEffect(() => {
+                document.documentElement.dir = dir;
+                document.documentElement.lang = lang;
+            }, [dir, lang]);
+
             const product = {
                 id: 1,
-                name: "لعبة كروت زُمَراً - الإصدار الحديث",
-                price: 150,
-                currency: "ج.م",
-                description: "تجربة اجتماعية بتصميم فيكتوري حديث، تجمع بين عمق التواصل ومتعة اللعب. صممت لتكون رفيقكم في الليالي المميزة.",
-                features: [
-                    "١٠٠ كرت بتصميم هندسي",
-                    "أسئلة عميقة بأسلوب عصري",
-                    "تحديات اجتماعية مبتكرة",
-                    "خامات فاخرة ضد الماء",
-                    "مناسبة لكل التجمعات"
-                ]
+                name: lang === 'ar' ? "لعبة كروت زُمَراً" : "Zumran Card Game",
+                price: 250,
+                image: "box.png"
+            };
+
+            const toggleLang = () => {
+                setLang(prev => prev === 'ar' ? 'en' : 'ar');
             };
 
             const addToCart = () => {
-                const existingItem = cart.find(item => item.id === product.id);
-                if (existingItem) {
-                    setCart(cart.map(item =>
-                        item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-                    ));
+                const existing = cart.find(i => i.id === product.id);
+                if (existing) {
+                    setCart(cart.map(i => i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i));
                 } else {
                     setCart([...cart, { ...product, quantity: 1 }]);
                 }
                 setIsCartOpen(true);
             };
 
-            const removeFromCart = (id) => {
-                setCart(cart.filter(item => item.id !== id));
-            };
-
-            const updateQuantity = (id, delta) => {
-                setCart(cart.map(item => {
-                    if (item.id === id) {
-                        const newQuantity = Math.max(1, item.quantity + delta);
-                        return { ...item, quantity: newQuantity };
-                    }
-                    return item;
-                }));
-            };
-
-            const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-            const [formData, setFormData] = useState({ name: '', phone: '', address: '', city: '' });
-
-            const handleInputChange = (e) => {
-                setFormData({ ...formData, [e.target.name]: e.target.value });
-            };
-
-            const handleSubmitOrder = (e) => {
-                e.preventDefault();
-                console.log("Order Placed:", { cart, formData, totalAmount });
-                setShowSuccess(true);
-                setCart([]);
-                setTimeout(() => {
-                    setShowSuccess(false);
-                    setIsCartOpen(false);
-                }, 4000);
-            };
-
-            // خلفية شبكية
-            const GridPattern = () => (
-                <div className="absolute inset-0 z-0 opacity-[0.04]"
-                    style={{
-                        backgroundImage: `linear-gradient(#0891b2 1px, transparent 1px), linear-gradient(to right, #0891b2 1px, transparent 1px)`,
-                        backgroundSize: '40px 40px'
-                    }}>
-                </div>
-            );
-
-            // أشكال عائمة
-            const FloatingShapes = () => (
-                <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-                    <div className="absolute top-10 left-10 w-72 h-72 bg-fuchsia-200 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-pulse"></div>
-                    <div className="absolute bottom-10 right-10 w-72 h-72 bg-cyan-200 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-pulse delay-1000"></div>
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
-                </div>
-            );
+            const removeFromCart = (id) => setCart(cart.filter(i => i.id !== id));
 
             return (
-                <div className="min-h-screen">
+                <div className={`min-h-screen ${lang === 'ar' ? 'font-sans' : ''}`}>
                     {/* Navbar */}
-                    <nav className="fixed w-full z-50 bg-white/80 backdrop-blur-lg border-b border-slate-200 shadow-sm">
+                    <nav className="fixed w-full z-50 bg-white border-b border-gray-100">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <div className="flex justify-between items-center h-20">
-                                {/* Logo */}
-                                <div className="flex items-center gap-3 group cursor-pointer">
-                                    <img src="logo-black.png" alt="Zumran Logo" className="w-16 h-16 object-contain group-hover:scale-110 transition-transform duration-300" />
-                                    <span className="text-2xl font-bold text-slate-900 tracking-wider">زُمَراً</span>
-                                </div>
-
-                                {/* Desktop Menu */}
-                                <div className="hidden md:flex items-center gap-8 text-sm font-semibold tracking-wide">
-                                    <a href="#home" className="text-slate-600 hover:text-cyan-600 transition-colors">الرئيسية</a>
-                                    <a href="#about" className="text-slate-600 hover:text-cyan-600 transition-colors">الفكرة</a>
-                                    <a href="#features" className="text-slate-600 hover:text-cyan-600 transition-colors">المميزات</a>
-                                </div>
-
-                                {/* Actions */}
                                 <div className="flex items-center gap-4">
-                                    <a href="https://instagram.com/zumran.shop" target="_blank" rel="noreferrer" className="text-slate-400 hover:text-fuchsia-600 transition-colors">
-                                        <Icons.Instagram size={20} />
-                                    </a>
-                                    <button
-                                        onClick={() => setIsCartOpen(true)}
-                                        className="relative p-2.5 bg-slate-100 rounded-xl hover:bg-slate-200 transition-colors text-cyan-700 border border-slate-200"
-                                    >
-                                        <Icons.ShoppingBag size={20} />
+                                    <div className="w-12 h-12">
+                                        <img src="logo-black.png" alt="Logo" className="w-full h-full object-contain" />
+                                    </div>
+                                    <span className="text-2xl font-bold tracking-wider hidden md:block">ZUMRAN</span>
+                                </div>
+
+                                <div className="hidden md:flex items-center gap-8 font-medium text-gray-600">
+                                    <a href="#home" className="hover:text-black transition-colors">{t.home}</a>
+                                    <a href="#shop" className="hover:text-black transition-colors">{t.shop}</a>
+                                    <a href="#about" className="hover:text-black transition-colors">{t.about}</a>
+                                </div>
+
+                                <div className="flex items-center gap-4">
+                                    <button onClick={toggleLang} className="flex items-center gap-2 text-sm font-bold border border-gray-200 px-3 py-1.5 rounded-full hover:bg-gray-50 transition-colors">
+                                        <Icons.Globe size={16} />
+                                        {t.language}
+                                    </button>
+                                    <button onClick={() => setIsCartOpen(true)} className="relative p-2 hover:bg-gray-50 rounded-full transition-colors">
+                                        <Icons.ShoppingBag size={24} />
                                         {cart.length > 0 && (
-                                            <span className="absolute -top-1 -right-1 bg-fuchsia-600 text-white text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full ring-2 ring-white">
-                                                {cart.reduce((a, b) => a + b.quantity, 0)}
+                                            <span className="absolute top-0 right-0 bg-black text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">
+                                                {cart.reduce((a, c) => a + c.quantity, 0)}
                                             </span>
                                         )}
                                     </button>
-
-                                    <button className="md:hidden p-2 text-slate-600" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                                        <Icons.Menu size={24} />
-                                    </button>
                                 </div>
                             </div>
                         </div>
-
-                        {/* Mobile Menu */}
-                        {isMenuOpen && (
-                            <div className="md:hidden bg-white border-b border-slate-100 absolute w-full pb-4 shadow-lg">
-                                <div className="flex flex-col space-y-1 px-4 pt-2">
-                                    <a href="#home" className="block py-3 text-slate-700 hover:bg-slate-50 px-2 rounded-lg" onClick={() => setIsMenuOpen(false)}>الرئيسية</a>
-                                    <a href="#about" className="block py-3 text-slate-700 hover:bg-slate-50 px-2 rounded-lg" onClick={() => setIsMenuOpen(false)}>الفكرة</a>
-                                    <a href="#features" className="block py-3 text-slate-700 hover:bg-slate-50 px-2 rounded-lg" onClick={() => setIsMenuOpen(false)}>المميزات</a>
-                                </div>
-                            </div>
-                        )}
                     </nav>
 
                     {/* Hero Section */}
-                    <section id="home" className="relative pt-32 pb-24 overflow-hidden min-h-screen flex items-center bg-slate-50">
-                        <GridPattern />
-                        <FloatingShapes />
-
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-                            <div className="flex flex-col md:flex-row items-center gap-16">
-
-                                {/* Text Content */}
-                                <div className="w-full md:w-1/2 text-center md:text-right space-y-8">
-                                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-50 border border-cyan-100 text-cyan-600 text-xs font-bold tracking-wider uppercase mb-2">
-                                        <Icons.Zap size={14} className="fill-current" />
-                                        الإصدار الجديد ٢٠٢٦
-                                    </div>
-                                    <h1 className="text-5xl md:text-7xl font-black text-slate-900 leading-tight">
-                                        أعد تعريف <br />
-                                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 via-fuchsia-600 to-fuchsia-700">
-                                            لحظات التواصل
-                                        </span>
-                                    </h1>
-                                    <p className="text-lg text-slate-600 leading-relaxed max-w-lg mx-auto md:mx-0 font-light">
-                                        لعبة "زُمَراً" ليست مجرد كروت، بل أداة اجتماعية صممت بعناية لتكسر الروتين وتفتح آفاقاً جديدة للحوار في مجالسكم، بلمسة عصرية تليق بكم.
-                                    </p>
-
-                                    <div className="flex flex-col sm:flex-row gap-5 justify-center md:justify-start pt-4">
-                                        <button
-                                            onClick={addToCart}
-                                            className="group relative px-8 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-lg transition-all shadow-xl hover:shadow-2xl overflow-hidden"
-                                        >
-                                            <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                                            <div className="flex items-center gap-2">
-                                                <Icons.ShoppingBag size={20} className="text-cyan-400" />
-                                                <span>اقتنِ نسختك</span>
-                                            </div>
-                                        </button>
-                                        <a href="#about" className="px-8 py-4 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold text-lg hover:border-cyan-500 hover:text-cyan-600 transition-all flex items-center justify-center shadow-sm">
-                                            اكتشف التفاصيل
-                                        </a>
-                                    </div>
-                                </div>
-
-                                {/* 3D Product Mockup */}
-                                <div className="w-full md:w-1/2 flex justify-center perspective-[2000px]">
-                                    <div className="relative group w-72 h-[26rem] md:w-80 md:h-[28rem] transform transition-all duration-700 hover:rotate-y-12 hover:rotate-x-6">
-
-                                        <div className="absolute inset-0 bg-gradient-to-tr from-cyan-500 to-fuchsia-600 blur-[50px] opacity-10 group-hover:opacity-30 transition-opacity duration-500 rounded-full"></div>
-
-                                        <div className="absolute inset-0 bg-[#0F172A] rounded-2xl border border-slate-700 shadow-2xl flex flex-col items-center justify-center overflow-hidden z-20">
-                                            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-                                            <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-b from-white/10 to-transparent"></div>
-
-                                            <div className="absolute -top-10 -right-10 w-40 h-40 bg-fuchsia-600/30 rounded-full blur-2xl"></div>
-                                            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-cyan-500/30 rounded-full blur-2xl"></div>
-
-                                            <div className="w-40 h-40 mb-8 z-10 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
-                                                <img src="logo-white.png" alt="Card Back" className="w-full h-full object-contain" />
-                                            </div>
-                                            <h3 className="text-4xl font-black text-white mb-2 tracking-widest z-10">زُمَراً</h3>
-                                            <p className="text-cyan-300 text-sm tracking-widest uppercase font-semibold z-10">The Social Card Game</p>
-
-                                            <div className="absolute bottom-8 w-full flex justify-center gap-2 opacity-50">
-                                                <div className="w-1 h-1 bg-white rounded-full"></div>
-                                                <div className="w-1 h-1 bg-white rounded-full"></div>
-                                                <div className="w-1 h-1 bg-white rounded-full"></div>
-                                            </div>
-                                        </div>
-
-                                        <div className="absolute top-2 left-2 w-full h-full bg-slate-800 rounded-2xl border border-slate-700 -z-10 transform translate-x-4 translate-y-4"></div>
-                                        <div className="absolute top-4 left-4 w-full h-full bg-fuchsia-200 rounded-2xl -z-20 transform translate-x-8 translate-y-8 blur-sm opacity-50"></div>
-                                    </div>
-                                </div>
+                    <section id="home" className="min-h-screen flex items-center justify-center bg-white pt-20">
+                        <div className="max-w-4xl mx-auto px-4 text-center space-y-8">
+                            <div className="w-48 h-48 mx-auto mb-8 animate-fadeIn">
+                                <img src="logo-black.png" alt="Zumran" className="w-full h-full object-contain" />
                             </div>
-                        </div>
-
-                        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce text-slate-400">
-                            <Icons.ChevronLeft className="-rotate-90" size={24} />
-                        </div>
-                    </section>
-
-                    {/* Features Grid */}
-                    <section id="features" className="py-24 bg-white relative">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <div className="text-center mb-20">
-                                <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">محتويات تليق <span className="text-fuchsia-600">بمجلسكم</span></h2>
-                                <div className="w-24 h-1.5 bg-gradient-to-r from-cyan-500 to-fuchsia-600 mx-auto rounded-full"></div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                {[
-                                    { icon: <Icons.Users size={32} />, title: "تفاعل اجتماعي", desc: "ديناميكية لعب مبتكرة تضمن مشاركة الجميع وكسر الحواجز بذكاء." },
-                                    { icon: <Icons.Layers size={32} />, title: "عمق في الطرح", desc: "أسئلة ومواضيع مختارة بعناية لتفتح أبواباً للحوار الهادف الممتع." },
-                                    { icon: <Icons.Hexagon size={32} />, title: "جودة بريميوم", desc: "كروت مصنعة من مواد فاخرة مع طبقة حماية، وتصميم فيكتوري فريد." }
-                                ].map((feature, idx) => (
-                                    <div key={idx} className="group relative p-1 bg-gradient-to-b from-slate-100 to-transparent rounded-3xl hover:from-cyan-100 hover:to-fuchsia-100 transition-all duration-500">
-                                        <div className="bg-white h-full p-8 rounded-[22px] relative overflow-hidden border border-slate-100 shadow-lg hover:shadow-xl transition-shadow">
-                                            <div className="absolute -right-6 -top-6 w-24 h-24 bg-slate-50 rounded-full group-hover:bg-cyan-50 transition-colors"></div>
-
-                                            <div className="w-16 h-16 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-center mb-6 text-cyan-600 group-hover:text-fuchsia-600 group-hover:scale-110 transition-all duration-300 shadow-sm">
-                                                {feature.icon}
-                                            </div>
-                                            <h3 className="text-xl font-bold text-slate-900 mb-3">{feature.title}</h3>
-                                            <p className="text-slate-600 leading-relaxed font-light">{feature.desc}</p>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* About Section */}
-                    <section id="about" className="py-32 relative bg-slate-50 overflow-hidden">
-                        <div className="absolute inset-0 transform -skew-y-3 bg-gradient-to-r from-fuchsia-50 to-cyan-50 origin-top-left scale-110"></div>
-
-                        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-                            <div className="w-32 h-32 mx-auto mb-8 drop-shadow-xl">
-                                <img src="logo-black.png" alt="Star" className="w-full h-full object-contain" />
-                            </div>
-
-                            <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-8">فلسفة زُمَراً</h2>
-                            <p className="text-lg md:text-2xl text-slate-600 leading-loose font-light mb-12">
-                                في عصر السرعة والرقمنة، تأتي <span className="text-cyan-600 font-bold">زُمَراً</span> لتعيد تعريف الجودة في الوقت الذي نقضيه معاً.
-                                استلهاماً من قيمنا، وصياغةً بلغة عصرنا، نقدم لكم تجربة تتجاوز كونها لعبة.. لتصبح ذكرى.
+                            <h1 className="text-5xl md:text-7xl font-black text-slate-900 leading-tight">
+                                {t.heroTitle}
+                            </h1>
+                            <p className="text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">
+                                {t.heroSubtitle}
                             </p>
-
-                            <button onClick={addToCart} className="px-12 py-4 bg-transparent border-2 border-fuchsia-600 text-fuchsia-600 hover:bg-fuchsia-600 hover:text-white rounded-full font-bold transition-all shadow-lg">
-                                اطلب نسختك الآن - {product.price} {product.currency}
-                            </button>
+                            <div className="pt-8">
+                                <a href="#shop" className="inline-block px-12 py-4 bg-black text-white text-lg font-bold rounded-full hover:scale-105 transition-transform shadow-xl">
+                                    {t.shopNow}
+                                </a>
+                            </div>
                         </div>
                     </section>
 
-                    {/* Cart Drawer */}
-                    {isCartOpen && (
-                        <div className="fixed inset-0 z-[60] flex justify-end">
-                            <div
-                                className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
-                                onClick={() => setIsCartOpen(false)}
-                            ></div>
-
-                            <div className="relative w-full max-w-md bg-white border-l border-slate-100 shadow-2xl h-full flex flex-col animate-slideInRight">
-                                <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                                    <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                                        <Icons.ShoppingBag size={20} className="text-cyan-600" />
-                                        حقيبة المشتريات
-                                    </h2>
-                                    <button
-                                        onClick={() => setIsCartOpen(false)}
-                                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
-                                    >
-                                        <Icons.X size={24} />
-                                    </button>
+                    {/* Product Section */}
+                    <section id="shop" className="py-24 bg-gray-50">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="flex flex-col md:flex-row gap-16 items-center">
+                                {/* Product Images */}
+                                <div className="w-full md:w-1/2 space-y-4">
+                                    <div className="aspect-square bg-white rounded-3xl p-8 shadow-sm border border-gray-100 flex items-center justify-center">
+                                        <img src="mockup.png" alt="Box" className="w-full h-full object-contain hover:scale-105 transition-transform duration-500" />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="aspect-square bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center justify-center">
+                                            <img src="box.png" alt="Detail" className="w-full h-full object-contain" />
+                                        </div>
+                                        <div className="aspect-square bg-black rounded-2xl p-8 flex items-center justify-center">
+                                            <img src="logo-white.png" alt="Logo White" className="w-full h-full object-contain opacity-80" />
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <div className="flex-1 overflow-y-auto p-6 bg-white">
-                                    {showSuccess ? (
-                                        <div className="h-full flex flex-col items-center justify-center text-center space-y-6 animate-fadeIn">
-                                            <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center text-green-600 shadow-sm">
-                                                <Icons.CheckCircle size={48} />
-                                            </div>
-                                            <div>
-                                                <h3 className="text-2xl font-bold text-slate-900 mb-2">تم تأكيد الطلب</h3>
-                                                <p className="text-slate-500">شكراً لاختيارك زُمَراً. <br />سيتواصل فريقنا معك قريباً.</p>
+                                {/* Product Details */}
+                                <div className="w-full md:w-1/2 space-y-8">
+                                    <div>
+                                        <h2 className="text-4xl font-bold text-slate-900 mb-2">{product.name}</h2>
+                                        <div className="flex items-center gap-4 mb-6">
+                                            <span className="text-3xl font-black text-slate-900">{t.price}</span>
+                                            <div className="flex text-yellow-500 text-sm">
+                                                {[...Array(5)].map((_, i) => <Icons.Star key={i} size={16} fill="currentColor" />)}
                                             </div>
                                         </div>
-                                    ) : cart.length === 0 ? (
-                                        <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
-                                            <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center text-slate-400">
-                                                <Icons.ShoppingBag size={40} />
+                                        <p className="text-gray-600 leading-relaxed text-lg">
+                                            {t.heroSubtitle}
+                                        </p>
+                                    </div>
+
+                                    <ul className="space-y-4">
+                                        {t.features.map((feature, idx) => (
+                                            <li key={idx} className="flex items-center gap-3 text-gray-700">
+                                                <div className="w-6 h-6 rounded-full bg-black text-white flex items-center justify-center shrink-0">
+                                                    <Icons.Check size={14} />
+                                                </div>
+                                                {feature}
+                                            </li>
+                                        ))}
+                                    </ul>
+
+                                    <div className="pt-8 border-t border-gray-200">
+                                        <button onClick={addToCart} className="w-full py-5 bg-black text-white text-xl font-bold rounded-2xl hover:bg-gray-800 transition-colors shadow-lg flex items-center justify-center gap-3">
+                                            <Icons.ShoppingBag size={24} />
+                                            {t.addToCart}
+                                        </button>
+                                        <p className="text-center text-gray-500 text-sm mt-4">{lang === 'ar' ? 'شحن سريع لجميع أنحاء المملكة' : 'Fast shipping worldwide'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Reviews Section */}
+                    <section className="py-24 bg-white overflow-hidden">
+                        <div className="max-w-7xl mx-auto px-4 mb-16 text-center">
+                            <h2 className="text-3xl font-bold mb-4">{t.reviewsTitle}</h2>
+                            <p className="text-gray-500">{t.reviewsSubtitle}</p>
+                        </div>
+
+                        <div className="relative">
+                            <div className="absolute inset-0 bg-gray-50 skew-y-3 transform origin-top-left z-0"></div>
+                            <div className="relative z-10 max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                                <div className="order-2 md:order-1 space-y-6">
+                                    {[1, 2, 3].map((r) => (
+                                        <div key={r} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                                            <div className="flex text-yellow-400 mb-2">
+                                                {[...Array(5)].map((_, i) => <Icons.Star key={i} size={16} fill="currentColor" />)}
                                             </div>
-                                            <p className="text-slate-500">الحقيبة فارغة حالياً</p>
-                                            <button
-                                                onClick={() => setIsCartOpen(false)}
-                                                className="mt-2 text-cyan-600 hover:text-cyan-700 font-bold hover:underline"
-                                            >
-                                                تصفح المنتجات
-                                            </button>
+                                            <p className="text-gray-600 mb-4">"منتج رائع جداً ويستحق الشراء. الجودة ممتازة والتصميم يفوق التوقعات."</p>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+                                                <span className="font-bold text-sm">محمد أحمد</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="order-1 md:order-2">
+                                    <img src="review-image.png" alt="Reviews" className="w-full rounded-2xl shadow-2xl skew-y-[-3deg] hover:skew-y-0 transition-transform duration-700" />
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Footer */}
+                    <footer className="bg-black text-white py-16">
+                        <div className="max-w-7xl mx-auto px-4 text-center">
+                            <img src="logo-white.png" alt="Logo" className="w-24 h-24 mx-auto mb-8 opacity-80" />
+                            <p className="text-gray-400 mb-8">{t.footerText}</p>
+                            <div className="flex justify-center gap-6 mb-8">
+                                <a href="#" className="hover:text-white text-gray-500"><Icons.Instagram /></a>
+                            </div>
+                            <p className="text-gray-600 text-sm">© 2026 ZUMRAN SHOP. All rights reserved.</p>
+                        </div>
+                    </footer>
+
+                    {/* Cart Sidebar (Simplified) */}
+                    {isCartOpen && (
+                        <div className="fixed inset-0 z-[60]">
+                            <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsCartOpen(false)}></div>
+                            <div className={`absolute top-0 ${lang === 'ar' ? 'left-0' : 'right-0'} h-full w-full max-w-md bg-white p-6 shadow-2xl flex flex-col`}>
+                                <div className="flex justify-between items-center mb-6">
+                                    <h2 className="text-xl font-bold">{t.cartTitle}</h2>
+                                    <button onClick={() => setIsCartOpen(false)}><Icons.X /></button>
+                                </div>
+                                <div className="flex-1 overflow-y-auto">
+                                    {cart.length === 0 ? (
+                                        <div className="h-full flex flex-col items-center justify-center text-gray-400">
+                                            <Icons.ShoppingBag size={48} className="mb-4 opacity-50" />
+                                            <p>{t.cartEmpty}</p>
                                         </div>
                                     ) : (
-                                        <div className="space-y-6">
-                                            {cart.map(item => (
-                                                <div key={item.id} className="flex gap-4 p-4 bg-slate-50 border border-slate-100 rounded-xl">
-                                                    <div className="w-20 h-20 bg-white rounded-lg flex items-center justify-center shrink-0 border border-slate-200 p-2">
-                                                        <img src="logo-black.png" alt={item.name} className="w-full h-full object-contain" />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <div className="flex justify-between items-start mb-2">
-                                                            <h4 className="font-bold text-slate-800">{item.name}</h4>
-                                                            <button onClick={() => removeFromCart(item.id)} className="text-slate-400 hover:text-red-500 transition-colors">
-                                                                <Icons.X size={16} />
-                                                            </button>
-                                                        </div>
-                                                        <p className="text-cyan-600 font-bold mb-3">{item.price} {item.currency}</p>
-                                                        <div className="flex items-center gap-3 bg-white w-max rounded-lg p-1 border border-slate-200 shadow-sm">
-                                                            <button
-                                                                onClick={() => updateQuantity(item.id, -1)}
-                                                                className="w-7 h-7 rounded bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center"
-                                                            >-</button>
-                                                            <span className="font-bold w-8 text-center text-slate-900">{item.quantity}</span>
-                                                            <button
-                                                                onClick={() => updateQuantity(item.id, 1)}
-                                                                className="w-7 h-7 rounded bg-cyan-600 text-white hover:bg-cyan-700 flex items-center justify-center"
-                                                            >+</button>
-                                                        </div>
-                                                    </div>
+                                        cart.map(item => (
+                                            <div key={item.id} className="flex gap-4 mb-4 p-4 border rounded-xl">
+                                                <img src={item.image} className="w-20 h-20 object-contain bg-gray-50 rounded-lg" />
+                                                <div>
+                                                    <h3 className="font-bold">{item.name}</h3>
+                                                    <p className="text-gray-500">{item.price} x {item.quantity}</p>
                                                 </div>
-                                            ))}
-
-                                            <div className="border-t border-slate-100 pt-6 mt-4">
-                                                <div className="flex justify-between items-center text-xl font-bold text-slate-900 mb-2">
-                                                    <span>الإجمالي</span>
-                                                    <span className="text-fuchsia-600">{totalAmount} {product.currency}</span>
-                                                </div>
-                                                <p className="text-xs text-slate-500 text-left">شامل الضريبة • الشحن يحسب عند التواصل</p>
                                             </div>
-                                        </div>
+                                        ))
                                     )}
                                 </div>
-
-                                {!showSuccess && cart.length > 0 && (
-                                    <div className="bg-slate-50 p-6 border-t border-slate-200">
-                                        <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
-                                            <Icons.Sparkles size={16} className="text-fuchsia-600" />
-                                            بيانات الشحن
-                                        </h3>
-                                        <form onSubmit={handleSubmitOrder} className="space-y-3">
-                                            <input
-                                                required name="name" placeholder="الاسم الكريم"
-                                                className="w-full px-4 py-3 bg-white rounded-lg border border-slate-200 text-slate-900 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none placeholder-slate-400 transition-all shadow-sm"
-                                                onChange={handleInputChange}
-                                            />
-                                            <input
-                                                required name="phone" placeholder="رقم الجوال" type="tel"
-                                                className="w-full px-4 py-3 bg-white rounded-lg border border-slate-200 text-slate-900 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none placeholder-slate-400 transition-all shadow-sm"
-                                                onChange={handleInputChange}
-                                            />
-                                            <div className="flex gap-2">
-                                                <input
-                                                    required name="city" placeholder="المدينة"
-                                                    className="w-1/2 px-4 py-3 bg-white rounded-lg border border-slate-200 text-slate-900 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none placeholder-slate-400 transition-all shadow-sm"
-                                                    onChange={handleInputChange}
-                                                />
-                                                <input
-                                                    required name="address" placeholder="الحي / الشارع"
-                                                    className="w-1/2 px-4 py-3 bg-white rounded-lg border border-slate-200 text-slate-900 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none placeholder-slate-400 transition-all shadow-sm"
-                                                    onChange={handleInputChange}
-                                                />
-                                            </div>
-
-                                            <button
-                                                type="submit"
-                                                className="w-full mt-4 bg-gradient-to-r from-cyan-600 to-fuchsia-600 text-white py-4 rounded-xl font-bold text-lg hover:from-cyan-700 hover:to-fuchsia-700 transition-all shadow-lg flex items-center justify-center gap-2"
-                                            >
-                                                <span>تأكيد الطلب</span>
-                                                <Icons.Send size={18} />
-                                            </button>
-                                        </form>
+                                {cart.length > 0 && (
+                                    <div className="border-t pt-4 mt-4">
+                                        <div className="flex justify-between font-bold text-xl mb-4">
+                                            <span>{t.total}</span>
+                                            <span>{cart.reduce((a, c) => a + (c.price * c.quantity), 0)}</span>
+                                        </div>
+                                        <button className="w-full py-4 bg-black text-white font-bold rounded-xl">{t.checkout}</button>
                                     </div>
                                 )}
                             </div>
                         </div>
                     )}
-
-                    {/* Footer */}
-                    <footer className="bg-white border-t border-slate-100 py-16 text-sm">
-                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                            <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-                                <div className="text-center md:text-right flex flex-col items-center md:items-end gap-4">
-                                    <div className="flex items-center gap-3">
-                                        <img src="logo-black.png" alt="Zumran Logo" className="w-12 h-12 object-contain" />
-                                        <h3 className="text-2xl font-black text-slate-900 tracking-wider">زُمَراً</h3>
-                                    </div>
-                                    <p className="text-slate-500">سجل تجاري رقم: ١٠١٠XXXXXX</p>
-                                </div>
-
-                                <div className="flex gap-8 font-medium text-slate-600">
-                                    <a href="#" className="hover:text-cyan-600 transition-colors">عن المتجر</a>
-                                    <a href="#" className="hover:text-cyan-600 transition-colors">سياسة الاستبدال</a>
-                                    <a href="#" className="hover:text-cyan-600 transition-colors">اتصل بنا</a>
-                                </div>
-
-                                <div className="flex gap-4">
-                                    <a href="https://instagram.com/zumran.shop" className="p-3 bg-slate-50 rounded-xl hover:bg-fuchsia-600 hover:text-white transition-all text-slate-500">
-                                        <Icons.Instagram size={20} />
-                                    </a>
-                                </div>
-                            </div>
-                            <div className="mt-12 pt-8 border-t border-slate-100 text-center text-slate-500 flex flex-col md:flex-row justify-center items-center gap-2">
-                                <span>© 2025 ZUMRAN SHOP.</span>
-                                <span className="hidden md:inline">•</span>
-                                <span>Designed with passion.</span>
-                            </div>
-                        </div>
-                    </footer>
                 </div>
             );
         };
